@@ -112,10 +112,15 @@ jobs:
 #### PHPUnit tests ###########################
     - &phpunit-tests
       php: 5.6
-      sudo: required
       install: composer install --prefer-dist --working-dir=src
-      before_script: ./utils/prepare-test -afty
+      before_script:
+        - psql -c "CREATE USER fossy WITH PASSWORD 'fossy' CREATEDB;" -U postgres
+        - psql -c "create database fossology;" -U postgres
+        - psql -c "CREATE USER fossologytest WITH CREATEDB LOGIN PASSWORD 'fossologytest';" -U postgres
+        - echo "localhost:*:*:fossy:fossy" >> ~/.pgpass && echo "localhost:*:*:fossologytest:fossologytest" >> ~/.pgpass
+        - chmod 0600 ~/.pgpass
       script:
+        - sed -i 's/\/var\/local/\/tmp\/local/' Makefile.conf
         - make build-lib VERSIONFILE build-cli
         - src/vendor/bin/phpunit -csrc/phpunit.xml --testsuite="Fossology PhpUnit Test Suite"
       after_success: php src/vendor/bin/coveralls -vv -x clover.xml
