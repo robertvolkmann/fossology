@@ -71,16 +71,25 @@ DISTRO=$(lsb_release --id --short)
 
 ########################################################################
 
-if [ $BUILDTIME ]; then
-  echo "*** Installing $DISTRO buildtime dependencies ***";
-fi
-
 if [ $RUNTIME ]; then
   echo "*** Installing $DISTRO runtime dependencies ***";
   case "$DISTRO" in
     Debian|Ubuntu|LinuxMint)
-      apt-get $YesOpt install \
-        bzip2 cabextract cpio genisoimage p7zip poppler-utils rpm tar upx-ucl unzip gzip sleuthkit p7zip-full unrar-free
+      apt-get $YesOpt install --no-install-recommends --no-install-suggests \
+        bzip2 \
+        cabextract \
+        cpio \
+        genisoimage \
+        gzip \
+        p7zip \
+        p7zip-full \
+        poppler-utils \
+        rpm \
+        sleuthkit \
+        tar \
+        upx-ucl \
+        unrar-free \
+        unzip
       ;;
     RedHatEnterprise*|CentOS)
       yum $YesOpt install \

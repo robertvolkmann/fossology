@@ -75,7 +75,7 @@ if [[ $BUILDTIME ]]; then
   echo "*** Installing $DISTRO buildtime dependencies ***";
   case "$DISTRO" in
     Debian|Ubuntu|LinuxMint)
-      apt-get $YesOpt install \
+      apt-get $YesOpt install --no-install-recommends --no-install-suggests \
         libssl-dev
       ;;
     RedHatEnterprise*|CentOS|Fedora)
@@ -83,10 +83,6 @@ if [[ $BUILDTIME ]]; then
         openssl-devel
       ;;
   esac
-fi
-
-if [[ $RUNTIME ]]; then
-  echo "*** Installing $DISTRO runtime dependencies ***";
 fi
 
 #######################################################################

@@ -71,15 +71,11 @@ DISTRO=$(lsb_release --id --short)
 
 ########################################################################
 
-if [[ $BUILDTIME ]]; then
-  echo "*** Installing $DISTRO buildtime dependencies ***";
-fi
-
 if [[ $RUNTIME ]]; then
   echo "*** Installing $DISTRO runtime dependencies ***";
   case "$DISTRO" in
     Debian|Ubuntu|LinuxMint)
-      apt-get $YesOpt install \
+      apt-get $YesOpt install --no-install-recommends --no-install-suggests \
         subversion git wget
       ;;
     RedHatEnterprise*|CentOS|Fedora)

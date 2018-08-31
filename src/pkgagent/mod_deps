@@ -75,7 +75,7 @@ if [[ $BUILDTIME ]]; then
   echo "*** Installing $DISTRO buildtime dependencies ***";
   case "$DISTRO" in
     Debian|Ubuntu|LinuxMint)
-      apt-get $YesOpt install \
+      apt-get $YesOpt install --no-install-recommends --no-install-suggests \
         librpm-dev
       ;;
     RedHatEnterprise*|CentOS|Fedora)
@@ -89,7 +89,7 @@ if [[ $RUNTIME ]]; then
   echo "*** Installing $DISTRO runtime dependencies ***";
   case "$DISTRO" in
     Debian|Ubuntu|LinuxMint)
-      apt-get $YesOpt install \
+      apt-get $YesOpt install --no-install-recommends --no-install-suggests \
         rpm
       ;;
     RedHatEnterprise*|CentOS|Fedora)

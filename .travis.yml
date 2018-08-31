@@ -53,14 +53,22 @@ jobs:
       install: composer install --prefer-dist --working-dir=src
       script: src/vendor/bin/phpcpd src/cli/ src/copyright/ src/decider*/ src/lib/ src/monk/ src/nomos/ src/readmeoss/ src/spdx2/ src/www/
 #### Docker tests ###########################
-    - name: Docker Tests
+    - &container-tests
+      name: Jessie Image Tests
       addons: {}
       services: docker
       sudo: required
-      before_script: docker-compose build
+      before_script: docker-compose build --build-arg BASE_IMAGE="debian:jessie" web
       script:
-        - src/testing/docker/test-cluster.sh
-        - src/testing/docker/test-standalone.sh
+      - src/testing/docker/default-docker-test.sh
+      - src/testing/docker/docker-compose-test.sh
+      after_script: skip
+    - <<: *container-tests
+      name: Xenial Image Tests
+      before_script: docker-compose build --build-arg BASE_IMAGE="ubuntu:xenial" web
+    - <<: *container-tests
+      name: Stretch Image Tests
+      before_script: docker-compose build --build-arg BASE_IMAGE="debian:stetch" web
 #### C/C++ agent tests ###########################
     - &compiler-tests
       env: CC=gcc-4.8 CXX=g++-4.8 CFLAGS='-Wall'
