@@ -16,9 +16,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-      - http_proxy
-      - https_proxy
-      - no_proxy
+        - http_proxy
+        - https_proxy
+        - no_proxy
+        - BASE_IMAGE=${BASE_IMAGE:-ubuntu:xenial}
     image: fossology
     restart: unless-stopped
     environment:
@@ -37,9 +38,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-      - http_proxy
-      - https_proxy
-      - no_proxy
+        - http_proxy
+        - https_proxy
+        - no_proxy
+        - BASE_IMAGE=${BASE_IMAGE:-ubuntu:xenial}
     image: fossology
     restart: unless-stopped
     environment:

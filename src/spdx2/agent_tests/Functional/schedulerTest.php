@@ -279,7 +279,7 @@ class SchedulerTest extends \PHPUnit\Framework\TestCase
       }
       $this->assertFileExists($zipFile, 'could not download SPDXTools');
 
-      system('unzip -n -d '.__DIR__.' '.$zipFile);
+      system('unzip -n -q -d '.__DIR__.' '.$zipFile);
       rename (__DIR__.'/SPDXTools-'.$tag.'/'.$jarFileBasename, $jarFile);
     }
     $this->assertFileExists($jarFile, 'could not extract SPDXTools');

@@ -1,0 +1,27 @@
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without any warranty.
+version: '3.4'
+
+services:
+  builder:
+    build:
+      context: ../../..
+      dockerfile: Dockerfile
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+        - BASE_IMAGE=${BASE_IMAGE:-ubuntu:xenial}
+      target: builder
+    image: fossology-builder
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    image: fossology-tests

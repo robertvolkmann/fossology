@@ -9,7 +9,8 @@
 #
 # Description: Docker container image recipe
 
-FROM debian:jessie as builder
+ARG BASE_IMAGE=ubuntu:xenial
+FROM $BASE_IMAGE as builder
 
 LABEL maintainer="Fossology <fossology@fossology.org>"
 
@@ -17,14 +18,11 @@ WORKDIR /fossology
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      git \
       lsb-release \
-      php5-cli \
       sudo \
  && rm -rf /var/lib/apt/lists/*
 
-COPY ./utils/fo-installdeps ./utils/fo-installdeps
-COPY ./utils/utils.sh ./utils/utils.sh
+COPY ./utils/fo-installdeps ./utils/utils.sh ./utils/
 COPY ./src/delagent/mod_deps ./src/delagent/
 COPY ./src/mimetype/mod_deps ./src/mimetype/
 COPY ./src/pkgagent/mod_deps ./src/pkgagent/
@@ -41,12 +39,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 
 COPY . .
 
-RUN /fossology/utils/install_composer.sh
-
-RUN make install clean
+RUN make install_offline
 
 
-FROM debian:jessie
+FROM $BASE_IMAGE
 
 LABEL maintainer="Fossology <fossology@fossology.org>"
 
@@ -55,19 +51,17 @@ COPY --from=builder /fossology/dependencies-for-runtime /fossology
 
 WORKDIR /fossology
 
+COPY ./utils/install_composer.sh ./utils/install_composer.sh
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       curl \
       lsb-release \
       sudo \
- && DEBIAN_FRONTEND=noninteractive /fossology/utils/fo-installdeps --offline --runtime -y \
+ && DEBIAN_FRONTEND=noninteractive /fossology/utils/fo-installdeps --runtime -y \
  && DEBIAN_FRONTEND=noninteractive apt-get purge -y lsb-release \
  && DEBIAN_FRONTEND=noninteractive apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/*
-
-# configure php
-COPY ./install/scripts/php-conf-fix.sh ./install/scripts/php-conf-fix.sh
-RUN /fossology/install/scripts/php-conf-fix.sh --overwrite
 
 # configure apache
 COPY ./install/src-install-apache-example.conf /etc/apache2/conf-available/fossology.conf
@@ -83,6 +77,14 @@ ENTRYPOINT ["/fossology/docker-entrypoint.sh"]
 COPY --from=builder /etc/cron.d/fossology /etc/cron.d/fossology
 COPY --from=builder /etc/init.d/fossology /etc/init.d/fossology
 COPY --from=builder /usr/local/ /usr/local/
+
+# install composer and configure php
+COPY Makefile.conf Makefile.conf
+COPY ./src/Makefile ./src/composer.lock ./src/composer.json ./src/
+COPY ./install/scripts/php-conf-fix.sh ./install/scripts/php-conf-fix.sh
+
+RUN make -C src composer_install \
+ && /fossology/install/scripts/php-conf-fix.sh --overwrite
 
 # the database is filled in the entrypoint
 RUN /usr/local/lib/fossology/fo-postinstall --agent --common --scheduler-only --web-only --no-running-database
