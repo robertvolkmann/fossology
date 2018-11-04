@@ -3,6 +3,7 @@ fossology310-source.spdx
 ################################################################################
 # omit rebuilding after changing some unrelated files.
 .editorconfig
+.git/objects
 .github
 .gitignore
 .travis.yml

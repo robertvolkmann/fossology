@@ -16,4 +16,4 @@
 
 finalConf=$(awk -F "=" '/finalConf/ {print $2}' testVariables.var | tr -d '; ')
 
-../../agent/ununpack -c $finalConf -Cv -d . -R -L ./$1.xml $1
+../../agent/ununpack -c $finalConf -C -d . -R -L ./$1.xml $1

@@ -99,25 +99,23 @@ if [[ $BUILDTIME ]]; then
    echo "*** Installing $DISTRO buildtime dependencies ***";
    case "$DISTRO" in
       Debian|Ubuntu|LinuxMint)
-         echo "DB: Installing build essential....."
          apt-get $YesOpt install \
-            libmxml-dev curl libxml2-dev libcunit1-dev \
-            build-essential libtext-template-perl subversion rpm librpm-dev libmagic-dev libglib2.0 libboost-regex-dev libboost-program-options-dev
-         if ! dpkg --get-selections | grep -q postgresql-server-dev; then  ## if postgresql-server-dev is not installed
-           case "$CODENAME" in
-              trusty)
-                apt-get $YesOpt install postgresql-server-dev-9.3;;
-              jessie)
-                apt-get $YesOpt install postgresql-server-dev-9.4;;
-              xenial)
-                apt-get $YesOpt install postgresql-server-dev-9.5;;
-              stretch|buster|sid)
-                apt-get $YesOpt install postgresql-server-dev-9.6;;
-              bionic)
-                apt-get $YesOpt install postgresql-server-dev-10;;
-              *) echo "ERROR: Unknown or Unsupported $DISTRO $CODENAME release, please report to the mailing list"; exit 1;;
-           esac
-         fi
+            build-essential \
+            curl \
+            git \
+            libcunit1-dev \
+            libglib2.0-dev \
+            libpq-dev \
+            libtext-template-perl \
+            libxml2-dev
+         case "$CODENAME" in
+            jessie|trusty)
+              apt-get $YesOpt install php5-cli libboost-program-options1.55-dev libboost-regex1.55-dev;;
+            xenial)
+              apt-get $YesOpt install php-cli libboost-program-options1.58-dev libboost-regex1.58-dev;;
+            *)
+              apt-get $YesOpt install php-cli libboost-program-options1.62-dev libboost-regex1.62-dev;;
+         esac
          ;;
       Fedora)
          yum $YesOpt groupinstall "Development Tools"
@@ -147,28 +145,29 @@ if [[ $RUNTIME ]]; then
    echo "*** apt-get install mail-transport-agent, pick one and install it***";
    case "$DISTRO" in
       Debian|Ubuntu|LinuxMint)
-        echo "doing runtime"
-         apt-get $YesOpt install apache2
-         apt-get $YesOpt install php-pear \
+         apt-get $YesOpt install \
+            apache2 \
+            binutils \
+            dpkg-dev \
+            git \
             libxml2 \
-            binutils php-gettext \
-            cabextract cpio sleuthkit genisoimage \
-            poppler-utils upx-ucl \
-            unrar-free unzip p7zip-full p7zip wget \
-            subversion git \
-            dpkg-dev
+            php-gettext \
+            postgresql \
+            subversion \
+            wget
          case "$CODENAME" in
-            trusty)
-               apt-get $YesOpt install postgresql-9.3 libapache2-mod-php5 php5 php5-pgsql php5-cli php5-curl heirloom-mailx libboost-program-options1.54.0 libboost-regex1.54.0;;
-            jessie)
-               apt-get $YesOpt install postgresql-9.4 libapache2-mod-php5 php5 php5-pgsql php5-cli php5-curl heirloom-mailx libboost-program-options1.55.0 libboost-regex1.55.0;;
+            jessie|trusty)
+               apt-get $YesOpt install \
+                 libapache2-mod-php5 php5 php5-pgsql php5-cli php5-curl \
+                 libboost-program-options1.55.0 libboost-regex1.55.0 heirloom-mailx;;
             xenial)
-               apt-get $YesOpt install postgresql-9.5 php7.0 libapache2-mod-php7.0 php7.0-pgsql php7.0-cli php7.0-curl php7.0-mbstring php7.0-zip s-nail libboost-program-options1.58.0 libboost-regex1.58.0;;
-            stretch|buster|sid)
-               apt-get $YesOpt install postgresql-9.6 php7.0 php7.0-pgsql php7.0-cli php7.0-curl php7.0-xml php7.0-zip php-mbstring s-nail libboost-program-options1.62.0 libboost-regex1.62.0;;
-            bionic)
-               apt-get $YesOpt install postgresql-10 php7.2 php7.2-pgsql php7.2-cli php7.2-curl php7.2-xml php7.2-zip php7.2-mbstring s-nail libboost-program-options1.65.1 libboost-regex1.65.1;;
-            *) echo "ERROR: Unknown or Unsupported $DISTRO $CODENAME release, please report to the mailing list"; exit 1;;
+               apt-get $YesOpt install \
+                 libapache2-mod-php php php-pgsql php-cli php-curl php-mbstring php-xml php-zip \
+                 libboost-program-options1.58.0 libboost-regex1.58.0 s-nail;;
+            *)
+               apt-get $YesOpt install \
+                 libapache2-mod-php php php-pgsql php-cli php-curl php-mbstring php-xml php-zip \
+                 libboost-program-options1.62.0 libboost-regex1.62.0 s-nail;;
          esac
          ;;
       Fedora)

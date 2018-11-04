@@ -85,8 +85,4 @@ if [[ $BUILDTIME ]]; then
   esac
 fi
 
-if [[ $RUNTIME ]]; then
-  echo "*** Installing $DISTRO runtime dependencies ***";
-fi
-
 #######################################################################
